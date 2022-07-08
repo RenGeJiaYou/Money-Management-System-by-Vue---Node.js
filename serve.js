@@ -16,6 +16,15 @@ mongoose
     console.log(err);
   });
 
+//添加中间件
+//添加 JSON 解析中间件处理表单。
+//当请求的数据类型是application/x-www-form-urlencoded时才会进入这个中间件进行处理。
+app.use(express.urlencoded({ extended: false }));
+
+//解析并返回 json格式的数据
+//只有是正确的content-type默认是application/json才进入这个中间件解析处理。
+app.use(express.json());
+
 //路由部分
 app.get("/", (req, res) => {
   res.send("hello world");
