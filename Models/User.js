@@ -9,5 +9,23 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
-  email: {},
+  email: {
+    type: String,
+    required: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  avatart: {
+    type: String,
+  },
+  date: {
+    type: Date,
+    default: Date.now,
+  },
 });
+
+var Users = mongoose.model("users", userSchema);
+
+module.exports = Users;
