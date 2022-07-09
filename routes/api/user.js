@@ -6,13 +6,7 @@ const bcrypt = require("bcrypt");
 const gravatar = require("gravatar");
 const jwt = require("jsonwebtoken");
 const key = require("../../config/keys").secretOrPrivateKey;
-
-// $route   GET /api/user/test
-// @desc    返回请求的 JSON 数据
-// @access  public
-router.get("/test", (req, res) => {
-  res.json({ msg: "this is /test page" });
-});
+const passport = require("passport");
 
 // $route   GET /api/user/register
 // @desc    提交注册信息
@@ -21,7 +15,7 @@ router.post("/register", (req, res) => {
   //先检查数据库是否已注册该邮箱
   User.findOne({ email: req.body.email }).then(user => {
     if (user) {
-      return res.status(400).json({ email: "邮箱已被注册" });
+      return res.status(400).json("邮箱已被注册");
     } else {
       //根据邮箱生成一个头像，实质是一个 url ,指向一个默认地址
       const avatar = gravatar.url(req.body.email, {
@@ -35,6 +29,7 @@ router.post("/register", (req, res) => {
         email: req.body.email,
         password: req.body.password,
         avatar,
+        identity: req.body.identity,
       });
       //加密密码:bcrypt.hash()在加密后，通过回调函数将内部的 err(错误信息) 和hash(密文) 翻出来
       bcrypt.hash(newUser.password, 10, function (err, hash) {
@@ -63,15 +58,21 @@ router.post("/login", (req, res) => {
   User.findOne({ email }).then(user => {
     if (!user) {
       //提示查无此用户，并转到登录页面
-      return res.status(404).json({ eamil: "查无此用户" });
+      return res.status(404).json("查无此用户");
     } else {
-      //存在此用户，检查密码
+      //存在此用户，检查密码。then()中的回调函数用于接收 bool 变量
       bcrypt.compare(password, user.password).then(isMatch => {
         if (isMatch) {
-          let rule = { id: user.id, name: user.name };
+          //rule 是指出要拿客户端哪些信息做 jwt 原料
+          let rule = {
+            id: user.id,
+            name: user.name,
+            avatar: user.avatar,
+            identity: user.identity,
+          };
           jwt.sign(rule, key, { expiresIn: 8 * 60 * 60 }, (err, token) => {
             if (err) throw err;
-            res.json({ msg: "success", jwt: token });
+            res.json({ msg: "success", jwt: "Bearer " + token });
           });
         } else {
           return res.status(400).json({ msg: "密码错误" });
@@ -80,6 +81,22 @@ router.post("/login", (req, res) => {
     }
   });
 });
+
+// $route   GET /api/user/current
+// @desc    返回 当前用户
+// @access  private
+router.get(
+  "/current",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    res.json({
+      id: req.user.id,
+      name: req.user.name,
+      email: req.user.email,
+      identity: req.user.identity,
+    });
+  }
+);
 
 module.exports = router;
 

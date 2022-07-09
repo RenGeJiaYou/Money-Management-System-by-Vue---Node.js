@@ -1,7 +1,8 @@
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 3000;
-const users = require("./routes/api/user"); //视频中user.js 里没写任何 export /module.export ,这样也能被成功导入吗?
+const users = require("./routes/api/user");
+const passport = require("passport");
 
 //DB config & connect
 const mongoose = require("mongoose");
@@ -11,7 +12,7 @@ mongoose
   .then(() => {
     console.log("连接MongoDB成功");
   })
-  .catch((err) => {
+  .catch(err => {
     console.log("连接 MongoDB 出错,错误原因为:");
     console.log(err);
   });
@@ -21,14 +22,13 @@ mongoose
 //当请求的数据类型是application/x-www-form-urlencoded时才会进入这个中间件进行处理。
 app.use(express.urlencoded({ extended: false }));
 
-//解析并返回 json格式的数据
+//解析并返回 json 格式的数据
 //只有是正确的content-type默认是application/json才进入这个中间件解析处理。
 app.use(express.json());
 
-//路由部分
-app.get("/", (req, res) => {
-  res.send("hello world");
-});
+//使用passport
+app.use(passport.initialize());
+require("./config/passport")(passport); //passport 传入到引入的 JS 文件里
 
 app.use("/api/user", users); //"/api/user" 是一个路由组,
 app.listen(port, () => {
