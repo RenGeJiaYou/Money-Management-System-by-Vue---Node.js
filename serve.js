@@ -1,7 +1,8 @@
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 3000;
-const users = require("./routes/api/user");
+const users = require("./routes/api/users");
+const profiles = require("./routes/api/profiles");
 const passport = require("passport");
 
 //DB config & connect
@@ -30,7 +31,9 @@ app.use(express.json());
 app.use(passport.initialize());
 require("./config/passport")(passport); //passport 传入到引入的 JS 文件里
 
-app.use("/api/user", users); //"/api/user" 是一个路由组,
+app.use("/api/user", users); //"/api/user" 是一个路由组
+app.use("/api/profile", profiles);
+
 app.listen(port, () => {
   console.log("serve is run");
 });
