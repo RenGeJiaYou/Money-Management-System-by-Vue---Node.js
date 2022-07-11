@@ -4,8 +4,11 @@
   "description": "一个基于 Vue + ElementUI + Experss.js + MongoDB 的资金管理系统,目的是初步掌握 Vue 的工程实践。",
   "main": "index.js",
   "scripts": {
+    "client-install":"npm install --prefix client",
+    "client":"npm start --prefix client",
     "start": "node serve.js",
-    "server": "nodemon serve.js"
+    "server": "nodemon serve.js",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "repository": {
     "type": "git",
@@ -25,6 +28,7 @@
   "homepage": "https://github.com/RenGeJiaYou/Money-Management-System-by-Vue-Node.js#readme",
   "dependencies": {
     "bcrypt": "^5.0.1",
+    "concurrently": "^7.2.2",
     "express": "^4.18.1",
     "gravatar": "^1.8.2",
     "jsonwebtoken": "^8.5.1",
