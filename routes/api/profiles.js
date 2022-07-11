@@ -70,4 +70,45 @@ router.get(
       .catch(err => res.status(404).json("查询出错"));
   }
 );
+
+// $route   GET /api/profile/update
+// @desc    修改收支信息
+// @access  private
+router.post(
+  "/update/:id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    const newProfile = {};
+    if (req.body.ieType) newProfile.ieType = req.body.ieType;
+    if (req.body.ieDescribe) newProfile.ieDescribe = req.body.ieDescribe;
+    if (req.body.income) newProfile.income = req.body.income;
+    if (req.body.expend) newProfile.expend = req.body.expend;
+    if (req.body.cash) newProfile.cash = req.body.cash;
+    if (req.body.remark) newProfile.remark = req.body.remark;
+    if (req.body.date) newProfile.date = req.body.date;
+
+    //{new：true} 要求返回修改后的新数据
+    Profile.findOneAndUpdate({ _id: req.params.id }, newProfile, { new: true })
+      .then(profile => {
+        res.json(profile);
+      })
+      .catch(err => res.status(400).json({ msg: "编辑用户信息出错" }));
+  }
+);
+
+// $route   GET /api/profile/delete
+// @desc    删除收支信息
+// @access  private
+router.delete(
+  "/delete/:id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    let id = req.params.id;
+    Profile.findByIdAndDelete(id)
+      .then(profile => {
+        res.json(profile);
+      })
+      .catch(err => res.status(400).json({ msg: "删除用户信息出错" }));
+  }
+);
 module.exports = router;
