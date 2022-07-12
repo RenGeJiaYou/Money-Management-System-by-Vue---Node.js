@@ -4,8 +4,8 @@
   "description": "一个基于 Vue + ElementUI + Experss.js + MongoDB 的资金管理系统,目的是初步掌握 Vue 的工程实践。",
   "main": "index.js",
   "scripts": {
-    "client-install":"npm install --prefix client",
-    "client":"npm start --prefix client",
+    "client-install": "npm install --prefix client",
+    "client": "npm start --prefix client",
     "start": "node serve.js",
     "server": "nodemon serve.js",
     "dev": "concurrently \"npm run server\" \"npm run client\""
