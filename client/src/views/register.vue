@@ -1,6 +1,6 @@
 <template>
   <div class="register">
-    <sectiom class="form_container">
+    <section class="form_container">
       <div class="manage_tip">
         <span class="title">资金在线管理系统</span>
         <el-form
@@ -27,10 +27,10 @@
             ></el-input>
           </el-form-item>
 
-          <el-form-item label="密码" prop="pass">
+          <el-form-item label="密码" prop="password">
             <el-input
               type="password"
-              v-model="registerForm.pass"
+              v-model="registerForm.password"
               autocomplete="off"
               placeholder="请输入密码"
             ></el-input>
@@ -66,18 +66,21 @@
           </el-form-item>
         </el-form>
       </div>
-    </sectiom>
+    </section>
   </div>
 </template>
 
 <script>
+import axios from "axios";
+import { Message } from "element-ui";
+
 //登录界面
 export default {
   name: "register",
   component: {},
   data() {
     var validatePass2 = (rule, value, callback) => {
-      if (value !== this.registerForm.pass) {
+      if (value !== this.registerForm.password) {
         callback(new Error("两次输入密码不一致!"));
       } else {
         callback();
@@ -87,9 +90,9 @@ export default {
       registerForm: {
         name: "",
         email: "",
-        pass: "",
+        password: "",
         checkPass: "",
-        identity: "",
+        identity: "employee", //默认值为员工
       },
       rules: {
         name: [
@@ -146,6 +149,7 @@ export default {
         {
           value: "employee",
           label: "员工",
+          default: true,
         },
       ],
     };
@@ -154,10 +158,15 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          alert("submit!");
-        } else {
-          console.log("error submit!!");
-          return false;
+          //随后"/api" -> "http://localhost:3000/api/"
+          //关于第二个参数 this.registerForm:
+          //作为一个JS 对象,将在请求时自动转换为 JSON 格式并放在请求报文的 body中
+          axios.post("/api/user/register", this.registerForm).then((res) => {
+            Message.success("注册成功");
+          });
+
+          //跳转到登录页面
+          this.$router.push("/login");
         }
       });
     },
